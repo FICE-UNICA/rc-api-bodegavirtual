@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Consumidor, TipoTramite, SolicitudTramite } from './app.models';
-import { EliminarSolicitudesDto, GetConsumidorDto } from './app.dtos';
+import {
+  ActualizarSolicitudDto,
+  EliminarSolicitudesDto,
+  GetConsumidorDto,
+} from './app.dtos';
 import { QueryTypes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -16,26 +20,37 @@ export class AppService {
   ) {}
 
   async getConsumidor(query: GetConsumidorDto) {
-    const consumidor = await this.consumidorModel.findAll({
-      include: ['persona'],
-      where: [{ '$persona.identidad_numero$': query.identidad_numero }],
-    });
+    try {
+      const consumidor = await this.consumidorModel.findAll({
+        include: ['persona'],
+        where: [{ '$persona.identidad_numero$': query.identidad_numero }],
+      });
 
-    return consumidor;
+      return consumidor;
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
   }
 
   async listarTramites() {
-    const tramites = await this.tramiteModel.findAll({
-      attributes: ['id', 'nombre', 'denominacion'],
-    });
+    try {
+      const tramites = await this.tramiteModel.findAll({
+        attributes: ['id', 'nombre', 'denominacion'],
+      });
 
-    return tramites;
+      return tramites;
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
   }
 
   async listarSolicitudes() {
-    const solicitudes =
-      (await this.sequelize?.query(
-        `SELECT dts.fecha, dts.estado, ntt.nombre as tramite_solicitado, ntt.denominacion,
+    try {
+      const solicitudes =
+        (await this.sequelize?.query(
+          `SELECT dts.fecha, dts.estado, ntt.nombre as tramite_solicitado, ntt.denominacion,
         (dp.primer_nombre || ' ' || dp.primer_apellido || ' ' || dp.segundo_apellido)
         as solicitante,
         dts.oficina_id, dts.bodega_id, dts.numero_nucleo, dts.vacante, dts.persona_id
@@ -53,10 +68,14 @@ export class AppService {
 
 
       `,
-        { type: QueryTypes.SELECT },
-      )) ?? [];
+          { type: QueryTypes.SELECT },
+        )) ?? [];
 
-    return solicitudes;
+      return solicitudes;
+    } catch (error) {
+      Logger.error(error);
+      throw new Error('Error al listar solicitudes');
+    }
   }
 
   async eliminarSolicitudes(body: EliminarSolicitudesDto) {
@@ -82,6 +101,28 @@ export class AppService {
       await transaction.rollback();
       Logger.error(error);
       throw new Error('Error al eliminar solicitudes');
+    }
+  }
+
+  async actualizarSolicitud(body: ActualizarSolicitudDto) {
+    try {
+      await this.solicitudModel.update(
+        { estado: body.estado },
+        {
+          where: {
+            persona_id: body.persona_id,
+            numero_nucleo: body.numero_nucleo,
+            bodega_id: body.bodega_id,
+            oficina_id: body.oficina_id,
+            vacante: body.vacante,
+          },
+        },
+      );
+
+      return { message: 'Solicitud actualizada exitosamente' };
+    } catch (error) {
+      Logger.error(error);
+      throw new Error('Error al actualizar solicitud');
     }
   }
 }

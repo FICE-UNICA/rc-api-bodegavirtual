@@ -18,7 +18,7 @@ export class GetConsumidorDto {
   identidad_numero: string;
 }
 
-class Solicitud {
+class SolicitudDto {
   @ApiProperty({ description: 'Numero de vacante' })
   @IsNumber()
   vacante: number;
@@ -71,10 +71,12 @@ export class EliminarSolicitudesDto {
     each: true,
     message: 'La informacion sobre las solicitudes debe ser valida',
   })
-  @Type(() => Solicitud)
-  solicitudes: Solicitud[];
+  @Type(() => SolicitudDto)
+  solicitudes: SolicitudDto[];
 }
 
-// export class ActualizarSolicitudDto {
-
-// }
+export class ActualizarSolicitudDto extends SolicitudDto {
+  @ApiProperty({ description: 'Nuevo estado para la solicitud' })
+  @IsString()
+  estado: string;
+}

@@ -1,6 +1,10 @@
-import { Body, Controller, Delete, Get, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Query } from '@nestjs/common';
 import { AppService } from './app.service';
-import { EliminarSolicitudesDto, GetConsumidorDto } from './app.dtos';
+import {
+  ActualizarSolicitudDto,
+  EliminarSolicitudesDto,
+  GetConsumidorDto,
+} from './app.dtos';
 
 @Controller('/')
 export class AppController {
@@ -23,5 +27,10 @@ export class AppController {
   @Delete('eliminar-solicitud')
   async eliminarSolicitudes(@Body() body: EliminarSolicitudesDto) {
     return await this.appService.eliminarSolicitudes(body);
+  }
+
+  @Patch('actualizar-solicitud')
+  async actualizarSolicitud(@Body() body: ActualizarSolicitudDto) {
+    return await this.appService.actualizarSolicitud(body);
   }
 }
