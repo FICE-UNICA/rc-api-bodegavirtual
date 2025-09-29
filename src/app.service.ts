@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Consumidor, TipoTramite, SolicitudTramite } from './app.models';
 import {
   ActualizarSolicitudDto,
+  CrearSolicitudDto,
   EliminarSolicitudesDto,
   GetConsumidorDto,
 } from './app.dtos';
@@ -123,6 +124,20 @@ export class AppService {
     } catch (error) {
       Logger.error(error);
       throw new Error('Error al actualizar solicitud');
+    }
+  }
+
+  async crearSolicitud(body: CrearSolicitudDto) {
+    try {
+      const solicitud = await this.solicitudModel.create({
+        ...body,
+        estado: 'PENDIENTE',
+        fecha: new Date(),
+      });
+      return solicitud;
+    } catch (error) {
+      Logger.error(error);
+      throw new Error('Error al crear solicitud');
     }
   }
 }

@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Patch, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import {
   ActualizarSolicitudDto,
+  CrearSolicitudDto,
   EliminarSolicitudesDto,
   GetConsumidorDto,
 } from './app.dtos';
@@ -32,5 +41,10 @@ export class AppController {
   @Patch('actualizar-solicitud')
   async actualizarSolicitud(@Body() body: ActualizarSolicitudDto) {
     return await this.appService.actualizarSolicitud(body);
+  }
+
+  @Post('crear-solicitud')
+  async crearSolicitud(@Body() body: CrearSolicitudDto) {
+    return await this.appService.crearSolicitud(body);
   }
 }

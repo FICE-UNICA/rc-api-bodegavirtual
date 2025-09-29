@@ -89,7 +89,7 @@ export class SolicitudTramite extends Model {
 
   @PrimaryKey
   @Column
-  declare vacante: boolean;
+  declare vacante: number;
 
   @PrimaryKey
   @Column

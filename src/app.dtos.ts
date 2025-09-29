@@ -5,6 +5,7 @@ import {
   IsDateString,
   IsArray,
   ValidateNested,
+  IsOptional,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
@@ -79,4 +80,13 @@ export class ActualizarSolicitudDto extends SolicitudDto {
   @ApiProperty({ description: 'Nuevo estado para la solicitud' })
   @IsString()
   estado: string;
+}
+
+export class CrearSolicitudDto extends SolicitudDto {
+  @ApiProperty({ description: 'Id del tipo de tramite solicitado' })
+  @IsNumber()
+  tipo_tramite_id: number;
+
+  @IsOptional()
+  declare fecha: Date;
 }
