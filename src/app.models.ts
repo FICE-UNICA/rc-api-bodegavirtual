@@ -33,19 +33,15 @@ export class Persona extends Model {
 
 @Table({ tableName: 'dat_consumidores', schema: 'public', timestamps: false })
 export class Consumidor extends Model {
-  @PrimaryKey
   @Column
   declare oficina_id: number;
 
-  @PrimaryKey
   @Column
   declare bodega_id: number;
 
-  @PrimaryKey
   @Column
   declare numero_nucleo: number;
 
-  @PrimaryKey
   @Column
   declare vacante: boolean;
 

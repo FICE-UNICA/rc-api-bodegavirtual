@@ -10,7 +10,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const config = new DocumentBuilder()
-    .setTitle('Bodega Virtual API')
+    .setTitle('API Bodega Virtual')
     .setDescription(
       'API para la solicitud de trámites y servicios relacionados con la bodega virtual',
     )
