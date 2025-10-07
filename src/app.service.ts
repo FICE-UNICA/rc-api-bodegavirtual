@@ -6,6 +6,8 @@ import {
   CrearSolicitudDto,
   EliminarSolicitudesDto,
   GetConsumidorDto,
+  ListarConsumidoresDto,
+  ListarSolicitudesDto,
 } from './app.dtos';
 import { QueryTypes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -34,6 +36,31 @@ export class AppService {
     }
   }
 
+  async listarConsumidores(query: ListarConsumidoresDto) {
+    const condiciones: {
+      oficina_id?: number;
+      bodega_id?: number;
+      numero_nucleo?: number;
+    }[] = [];
+    if (query.oficina_id) condiciones.push({ oficina_id: query.oficina_id });
+    if (query.bodega_id) condiciones.push({ bodega_id: query.bodega_id });
+    if (query.numero_nucleo)
+      condiciones.push({ numero_nucleo: query.numero_nucleo });
+    try {
+      const consumidores = await this.consumidorModel.findAll({
+        include: ['persona'],
+        where: condiciones,
+        limit: query.limit ?? 10,
+        offset: ((query.page ?? 1) - 1) * (query.limit ?? 10),
+      });
+
+      return consumidores;
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
+  }
+
   async listarTramites() {
     try {
       const tramites = await this.tramiteModel.findAll({
@@ -47,7 +74,12 @@ export class AppService {
     }
   }
 
-  async listarSolicitudes() {
+  async listarSolicitudes(query: ListarSolicitudesDto) {
+    const { oficina_id, bodega_id, numero_nucleo } = query;
+    const condiciones: string[] = [`dts.oficina_id = ${oficina_id}`];
+    if (bodega_id) condiciones.push(`dts.bodega_id = ${bodega_id}`);
+    if (numero_nucleo) condiciones.push(`dts.numero_nucleo = ${numero_nucleo}`);
+
     try {
       const solicitudes =
         (await this.sequelize?.query(
@@ -66,9 +98,7 @@ export class AppService {
       and dc.oficina_id = dts.oficina_id
       join dat_personas dp
       on dp.persona_sid = dc.persona_id
-
-
-      `,
+      where ${condiciones.join(' AND ')}`,
           { type: QueryTypes.SELECT },
         )) ?? [];
 
