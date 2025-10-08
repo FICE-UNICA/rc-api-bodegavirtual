@@ -55,6 +55,10 @@ export class Consumidor extends Model {
 
 @Table({ tableName: 'nom_tipos_tramites', schema: 'public', timestamps: false })
 export class TipoTramite extends Model {
+  @PrimaryKey
+  @Column
+  declare id: number;
+
   @Column
   declare nombre: string;
 
@@ -100,4 +104,33 @@ export class SolicitudTramite extends Model {
 
   @Column
   declare tipo_tramite_id: number;
+}
+
+@Table({
+  tableName: 'dat_tramites',
+  schema: 'public',
+  timestamps: false,
+})
+export class Tramite extends Model {
+  @PrimaryKey
+  @Column
+  declare id: string;
+
+  @Column
+  declare fecha: Date;
+
+  @Column
+  declare solicitante_id: string;
+
+  @Column
+  declare tipo_tramite_id: number;
+
+  @HasOne(() => Persona, {
+    foreignKey: 'persona_sid',
+    sourceKey: 'solicitante_id',
+  })
+  declare solicitante: Persona;
+
+  @HasOne(() => TipoTramite, { foreignKey: 'id', sourceKey: 'tipo_tramite_id' })
+  declare tipo_tramite: TipoTramite;
 }

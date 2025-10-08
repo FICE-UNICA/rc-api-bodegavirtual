@@ -7,10 +7,11 @@ import {
   Persona,
   TipoTramite,
   SolicitudTramite,
+  Tramite,
 } from './app.models';
 import { AppService } from './app.service';
 
-const models = [Consumidor, Persona, TipoTramite, SolicitudTramite];
+const models = [Consumidor, Persona, TipoTramite, SolicitudTramite, Tramite];
 
 @Module({
   imports: [

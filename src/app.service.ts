@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Consumidor, TipoTramite, SolicitudTramite } from './app.models';
+import {
+  Consumidor,
+  TipoTramite,
+  SolicitudTramite,
+  Tramite,
+} from './app.models';
 import {
   ActualizarSolicitudDto,
   CrearSolicitudDto,
@@ -8,6 +13,7 @@ import {
   GetConsumidorDto,
   ListarConsumidoresDto,
   ListarSolicitudesDto,
+  ListarTramitesConsumidorDto,
 } from './app.dtos';
 import { QueryTypes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -16,9 +22,11 @@ import { Sequelize } from 'sequelize-typescript';
 export class AppService {
   constructor(
     @InjectModel(Consumidor) private consumidorModel: typeof Consumidor,
-    @InjectModel(TipoTramite) private tramiteModel: typeof TipoTramite,
+    @InjectModel(TipoTramite) private tipoTramiteModel: typeof TipoTramite,
     @InjectModel(SolicitudTramite)
     private solicitudModel: typeof SolicitudTramite,
+    @InjectModel(Tramite)
+    private tramiteModel: typeof Tramite,
     private sequelize: Sequelize,
   ) {}
 
@@ -63,7 +71,7 @@ export class AppService {
 
   async listarTramites() {
     try {
-      const tramites = await this.tramiteModel.findAll({
+      const tramites = await this.tipoTramiteModel.findAll({
         attributes: ['id', 'nombre', 'denominacion'],
       });
 
@@ -75,10 +83,11 @@ export class AppService {
   }
 
   async listarSolicitudes(query: ListarSolicitudesDto) {
-    const { oficina_id, bodega_id, numero_nucleo } = query;
+    const { oficina_id, bodega_id, numero_nucleo, persona_id } = query;
     const condiciones: string[] = [`dts.oficina_id = ${oficina_id}`];
     if (bodega_id) condiciones.push(`dts.bodega_id = ${bodega_id}`);
     if (numero_nucleo) condiciones.push(`dts.numero_nucleo = ${numero_nucleo}`);
+    if (persona_id) condiciones.push(`dts.persona_id = '${persona_id}'`);
 
     try {
       const solicitudes =
@@ -168,6 +177,26 @@ export class AppService {
     } catch (error) {
       Logger.error(error);
       throw new Error('Error al crear solicitud');
+    }
+  }
+
+  async listarTramitesConsumidor(query: ListarTramitesConsumidorDto) {
+    try {
+      const tramites = await this.tramiteModel.findAll({
+        where: { solicitante_id: query.persona_id },
+        include: [
+          'solicitante',
+          {
+            model: TipoTramite,
+            as: 'tipo_tramite',
+            attributes: ['id', 'nombre', 'denominacion'],
+          },
+        ],
+      });
+      return tramites;
+    } catch (error) {
+      Logger.error(error);
+      throw new Error('Error al listar tramites del consumidor');
     }
   }
 }

@@ -93,18 +93,29 @@ export class CrearSolicitudDto extends SolicitudDto {
 
 export class ListarSolicitudesDto {
   @ApiProperty({ description: 'Id de la oficina de registro de consumidores' })
-  @IsNumber()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'oficina_id debe ser un número válido' })
   oficina_id: number;
 
-  @ApiProperty({ description: 'Numero del nucleo de consumidores' })
-  @IsNumber()
+  @ApiProperty({
+    description: 'Numero del nucleo de consumidores',
+    required: false,
+  })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'numero_nucleo debe ser un número válido' })
   numero_nucleo?: number;
 
-  @ApiProperty({ description: 'Id del comercio (bodega)' })
-  @IsNumber()
+  @ApiProperty({ description: 'Id del comercio (bodega)', required: false })
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber({}, { message: 'bodega_id debe ser un número válido' })
   bodega_id?: number;
+
+  @ApiProperty({ description: 'Id del solicitante', required: false })
+  @IsOptional()
+  @IsString()
+  persona_id?: string;
 }
 
 export class ListarConsumidoresDto {
@@ -113,27 +124,41 @@ export class ListarConsumidoresDto {
   @IsNumber({}, { message: 'oficina_id debe ser un número válido' })
   oficina_id: number;
 
-  @ApiProperty({ description: 'Numero del nucleo de consumidores' })
+  @ApiProperty({
+    description: 'Numero del nucleo de consumidores',
+    required: false,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'numero_nucleo debe ser un número válido' })
   numero_nucleo?: number;
 
-  @ApiProperty({ description: 'Id del comercio (bodega)' })
+  @ApiProperty({ description: 'Id del comercio (bodega)', required: false })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'bodega_id debe ser un número válido' })
   bodega_id?: number;
 
-  @ApiProperty({ description: 'Id del comercio (bodega)' })
+  @ApiProperty({ description: 'Número de página', required: false })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'bodega_id debe ser un número válido' })
   page?: number;
 
-  @ApiProperty({ description: 'Id del comercio (bodega)' })
+  @ApiProperty({
+    description: 'Cantidad de registros por página',
+    required: false,
+  })
   @IsOptional()
   @Type(() => Number)
   @IsNumber({}, { message: 'bodega_id debe ser un número válido' })
   limit?: number;
+}
+
+export class ListarTramitesConsumidorDto {
+  @ApiProperty({
+    description: 'ID de la persona',
+  })
+  @IsString()
+  persona_id: string;
 }
